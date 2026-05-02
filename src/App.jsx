@@ -50,12 +50,8 @@ export default function App() {
         <directionalLight position={[-3.5, 4.5, 3.5]} intensity={1.0} color="#ffffff" />
         <directionalLight position={[5, 2, 1.5]} intensity={0.5} color="#ffffff" />
 
-        <AnimatedClouds />
         <ClothText texture={textTexture} position={[0, 0.05, 0]} rotation={[0, 0, 0]} />
         <Orb textTexture={textTexture} position={[0, 0, -4]} scale={2.5} />
-
-        {/* Soft grounding shadow */}
-        <ContactShadows position={[0, -2.7, 0]} opacity={0.6} scale={20} blur={2.5} far={4.5} />
 
         <EffectComposer>
           <Bloom intensity={0.15} luminanceThreshold={0.9} luminanceSmoothing={0.5} mipmapBlur />

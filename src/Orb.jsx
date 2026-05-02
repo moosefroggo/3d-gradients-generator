@@ -252,18 +252,17 @@ export default function Orb({ textTexture, position = [0, 0, -8], ...props }) {
           );
           
           // Check if vertex is horizontally behind the text area
-          if (textUV.x >= 0.0 && textUV.x <= 1.0 && textUV.y >= 0.0 && textUV.y <= 1.0) {
-              // Sample the exact shape of the letters
-              float textAlpha = texture2D(uTextMask, textUV).a;
+          if (textUV.x >= -0.05 && textUV.x <= 1.05 && textUV.y >= -0.05 && textUV.y <= 1.05) {
+              // Simplify to 1 texture sample for performance, rely on smoothstep for softness
+              float softAlpha = texture2D(uTextMask, textUV).a;
               
-              if (textAlpha > 0.05) {
-                  // If the orb bulges too close to Z=0 (where the text is), dent it backwards
-                  // The deeper it tries to push past Z=-0.2, the harder we dent it.
-                  float depthPenetration = (worldPos.z - (-0.2)) * 2.5; 
+              if (softAlpha > 0.01) {
+                  float dentThreshold = -0.3;
+                  float depthPenetration = (worldPos.z - dentThreshold) * 2.0; 
+                  
                   if (depthPenetration > 0.0) {
-                      // Apply dent in local space (divide by base Z scale 2.5)
-                      // Dent amount proportional to alpha so edges are smooth
-                      float dent = (depthPenetration * textAlpha) / 2.5;
+                      float mask = smoothstep(0.0, 0.4, softAlpha);
+                      float dent = (depthPenetration * mask) / 2.5;
                       morphedPos.z -= dent;
                   }
               }
@@ -273,25 +272,33 @@ export default function Orb({ textTexture, position = [0, 0, -8], ...props }) {
       }
     ` + shader.vertexShader
 
-    // Recompute normals for morphed geometry
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <beginnormal_vertex>',
-      `
-      vec3 up = abs(normal.y) < 0.999 ? vec3(0.0, 1.0, 0.0) : vec3(1.0, 0.0, 0.0);
-      vec3 t1 = normalize(cross(normal, up));
-      vec3 t2 = normalize(cross(normal, t1));
-      
-      vec3 morphedPosNormal = getMorphedPosition(position);
-      vec3 p1 = getMorphedPosition(position + t1 * 0.01);
-      vec3 p2 = getMorphedPosition(position + t2 * 0.01);
-      
-      vec3 newNormal = normalize(cross(p1 - morphedPosNormal, p2 - morphedPosNormal));
-      
-      vec3 objectNormal = normalize(mix(normal, newNormal, uMorph));
-      `
-    )
+    // 1. Recompute normals for morphed geometry (Only for materials that support lighting)
+    if (materialType !== 'basic') {
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <beginnormal_vertex>',
+        `
+        vec3 helper = abs(normal.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+        vec3 myTangent = normalize(cross(helper, normal));
+        vec3 myBitangent = normalize(cross(normal, myTangent));
+        
+        float stepSize = 0.02;
+        vec3 p0_n = getMorphedPosition(position);
+        vec3 p1_n = getMorphedPosition(position + myTangent * stepSize);
+        vec3 p2_n = getMorphedPosition(position + myBitangent * stepSize);
+        
+        vec3 reconstructedNormal = cross(p1_n - p0_n, p2_n - p0_n);
+        if (length(reconstructedNormal) > 0.0001) {
+            reconstructedNormal = normalize(reconstructedNormal);
+        } else {
+            reconstructedNormal = normal;
+        }
+        
+        vec3 objectNormal = reconstructedNormal;
+        `
+      )
+    }
 
-    // Apply deformed position and pass varyings
+    // 2. Apply deformed position and pass varyings
     shader.vertexShader = shader.vertexShader.replace(
       '#include <begin_vertex>',
       `
@@ -300,7 +307,14 @@ export default function Orb({ textTexture, position = [0, 0, -8], ...props }) {
       vUv = uv;
       vOriginalPosition = position;
       vPosition = transformed;
-      myNormal = normalize(normalMatrix * objectNormal);
+      
+      // Pass the computed normal to the fragment shader
+      #ifdef USE_NORMAL
+        myNormal = normalize(normalMatrix * objectNormal);
+      #else
+        myNormal = vec3(0.0, 0.0, 1.0); // Fallback for basic
+      #endif
+
       vec4 mvPos = modelViewMatrix * vec4(transformed, 1.0);
       myViewPosition = -mvPos.xyz;
       `
@@ -353,16 +367,17 @@ export default function Orb({ textTexture, position = [0, 0, -8], ...props }) {
       '#include <dithering_fragment>',
       `
       #include <dithering_fragment>
-      // Clamp to prevent negative values from causing NaN in pow(), which breaks the Bloom pass and causes black flickers
+      // Adjusted Rim Light to be more subtle and prevent dark outlines
       float edgeRim = clamp(1.0 - max(dot(normalize(myNormal), normalize(myViewPosition)), 0.0), 0.0, 1.0);
-      gl_FragColor.rgb = mix(gl_FragColor.rgb, baseColor * 1.1, pow(edgeRim, 1.5) * 0.85);
+      vec3 glowColor = baseColor * 1.25;
+      gl_FragColor.rgb = mix(gl_FragColor.rgb, glowColor, pow(edgeRim, 2.5) * 0.6);
       `
     )
   }, [customUniforms])
 
   return (
-    <mesh ref={meshRef} position={position} scale={[scaleX, scaleY, 2.5]} castShadow>
-      <sphereGeometry args={[1.4, 512, 1024]} />
+    <mesh ref={meshRef} position={position} scale={[scaleX, scaleY, 2.5]}>
+      <sphereGeometry args={[1.4, 192, 384]} />
       {materialType === 'glass' && (
         <meshPhysicalMaterial
           ref={matRef}
