@@ -33,6 +33,7 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
     uEvolutionSpeed: { value: 0 },
     uScaleX: { value: 0 },
     uScaleY: { value: 0 },
+    uScaleZ: { value: 0 },
     uGradientType: { value: 0 }
   }), [])
 
@@ -55,7 +56,7 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
 
   // Calculate scaling for edge-to-edge
   const finalScale = useMemo(() => {
-    if (!fullscreen) return [store.scaleX, store.scaleY, 2.5]
+    if (!fullscreen) return [store.scaleX, store.scaleY, store.scaleZ]
     
     // Stable fallback for viewport scaling
     // Camera is at z=4, Orb is at z=-4. Distance = 8.
@@ -79,6 +80,7 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
     customUniforms.uEvolutionSpeed.value = evolutionSpeed
     customUniforms.uScaleX.value = finalScale[0]
     customUniforms.uScaleY.value = finalScale[1]
+    customUniforms.uScaleZ.value = finalScale[2]
     customUniforms.uGradientType.value = gradientType
     
     // Update colors if they changed

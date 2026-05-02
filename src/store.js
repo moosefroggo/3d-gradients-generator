@@ -30,6 +30,7 @@ export const useStore = create((set) => ({
   // Geometry controls
   scaleX: 2.5,
   scaleY: 2.5,
+  scaleZ: 2.5,
   
   // Evolution Speed for noise shifting
   evolutionSpeed: 0.3,
@@ -60,6 +61,7 @@ export const useStore = create((set) => ({
   setSpeed: (val) => set({ speed: val }),
   setScaleX: (val) => set({ scaleX: val }),
   setScaleY: (val) => set({ scaleY: val }),
+  setScaleZ: (val) => set({ scaleZ: val }),
   setEvolutionSpeed: (val) => set({ evolutionSpeed: val }),
   setGradientType: (val) => set({ gradientType: parseInt(val) }),
   setFullscreen: (val) => set({ fullscreen: val }),

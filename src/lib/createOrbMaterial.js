@@ -214,10 +214,11 @@ export function createOrbMaterial(type, uniforms, options = {}) {
     shader.uniforms.uEvolutionSpeed = uniforms.uEvolutionSpeed
     shader.uniforms.uScaleX = uniforms.uScaleX
     shader.uniforms.uScaleY = uniforms.uScaleY
+    shader.uniforms.uScaleZ = uniforms.uScaleZ
 
     const dentingLogic = isBg ? '' : `
       // Project the vertex's world position onto the Text's local UV space.
-      vec3 worldPos = morphedPos * vec3(uScaleX, uScaleY, 2.5) + vec3(0.0, 0.0, -4.0);
+      vec3 worldPos = morphedPos * vec3(uScaleX, uScaleY, uScaleZ) + vec3(0.0, 0.0, -4.0);
       vec2 textUV = vec2((worldPos.x + 1.4) / 2.8, (worldPos.y + 0.75) / 1.6);
       
       if (textUV.x >= -0.05 && textUV.x <= 1.05 && textUV.y >= -0.05 && textUV.y <= 1.05) {
@@ -227,7 +228,7 @@ export function createOrbMaterial(type, uniforms, options = {}) {
               float depthPenetration = (worldPos.z - dentThreshold) * 2.0; 
               if (depthPenetration > 0.0) {
                   float mask = smoothstep(0.0, 0.4, softAlpha);
-                  float dent = (depthPenetration * mask) / 2.5;
+                  float dent = (depthPenetration * mask) / uScaleZ;
                   morphedPos.z -= dent;
               }
           }
@@ -249,12 +250,13 @@ export function createOrbMaterial(type, uniforms, options = {}) {
       uniform float uEvolutionSpeed;
       uniform float uScaleX;
       uniform float uScaleY;
+      uniform float uScaleZ;
 
       ${noiseLibrary}
 
-      vec3 getMorphedPosition(vec3 pos) {
+      vec3 getMorphedPosition(vec3 pos, vec3 norm) {
           float noiseVal = getNoise(uNoiseType, pos * uFrequency + vec3(uTime * uEvolutionSpeed, uTime * uEvolutionSpeed * 0.8, uTime * uEvolutionSpeed * 1.2));
-          vec3 targetPos = pos + normalize(pos) * noiseVal * uAmplitude;
+          vec3 targetPos = pos + norm * noiseVal * uAmplitude;
           vec3 morphedPos = mix(pos, targetPos, uMorph);
           ${dentingLogic}
           return morphedPos;
@@ -270,9 +272,9 @@ export function createOrbMaterial(type, uniforms, options = {}) {
         vec3 myBitangent = normalize(cross(normal, myTangent));
         
         float stepSize = 0.005; // Smaller step for much smoother peaks
-        vec3 p0_n = getMorphedPosition(position);
-        vec3 p1_n = getMorphedPosition(position + myTangent * stepSize);
-        vec3 p2_n = getMorphedPosition(position + myBitangent * stepSize);
+        vec3 p0_n = getMorphedPosition(position, normal);
+        vec3 p1_n = getMorphedPosition(position + myTangent * stepSize, normal);
+        vec3 p2_n = getMorphedPosition(position + myBitangent * stepSize, normal);
         
         vec3 reconstructedNormal = cross(p1_n - p0_n, p2_n - p0_n);
         if (length(reconstructedNormal) > 0.0001) {
@@ -289,7 +291,7 @@ export function createOrbMaterial(type, uniforms, options = {}) {
     shader.vertexShader = shader.vertexShader.replace(
       '#include <begin_vertex>',
       `
-      vec3 transformed = getMorphedPosition(position);
+      vec3 transformed = getMorphedPosition(position, normal);
       vUv = uv;
       vOriginalPosition = position;
       vPosition = transformed;
