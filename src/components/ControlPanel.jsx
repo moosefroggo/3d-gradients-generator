@@ -43,8 +43,8 @@ export default function ControlPanel() {
   }
 
   return (
-    <div className="fixed top-6 right-6 w-80 z-50 animate-in fade-in slide-in-from-top-4 duration-1000">
-      <div className="bg-white/90 backdrop-blur-2xl border border-white/20 shadow-2xl rounded-[2.5rem] p-6 overflow-hidden relative">
+    <div className="fixed top-6 right-6 bottom-6 w-80 z-50 animate-in fade-in slide-in-from-top-4 duration-1000 pointer-events-none">
+      <div className="bg-white/90 backdrop-blur-2xl border border-white/20 shadow-2xl rounded-[2.5rem] p-6 overflow-y-auto relative max-h-full pointer-events-auto custom-scrollbar overscroll-contain">
         <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
           <div className="flex items-center gap-2">
             <Settings2 className="w-5 h-5 text-gray-500" />
