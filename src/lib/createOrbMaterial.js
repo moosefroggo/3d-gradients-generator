@@ -342,8 +342,8 @@ export function createOrbMaterial(type, uniforms, options = {}) {
         baseColor = mix(mixY0, mixY1, nz);
       }
       
-      // Apply subtle dithering to break up banding
-      baseColor += (random(vUv + uTime) - 0.5) * (1.0/255.0);
+      // Apply subtle dithering to break up banding (Screen Space)
+      baseColor += (random(gl_FragCoord.xy + uTime) - 0.5) * (1.0/255.0);
       
       vec4 diffuseColor = vec4( baseColor, opacity );
       `
