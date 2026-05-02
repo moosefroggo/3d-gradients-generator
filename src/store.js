@@ -9,9 +9,15 @@ export const GRADIENT_PRESETS = {
 }
 
 export const useStore = create((set) => ({
+  // Performance Quality: 0: Performance, 1: Balanced, 2: Cinema
+  quality: 1,
+
   // Noise Selection: 0: Simplex, 1: Perlin, 2: Worley, 3: FBM
   noiseType: 0,
   
+  // Shape Selection: sphere, box, torus, cylinder
+  shapeType: 'sphere',
+
   // Parametric controls
   frequency: 0.6,
   amplitude: 0.2,
@@ -36,7 +42,9 @@ export const useStore = create((set) => ({
   colors: GRADIENT_PRESETS.pantone,
 
   // Actions
+  setQuality: (val) => set({ quality: parseInt(val) }),
   setNoiseType: (val) => set({ noiseType: parseInt(val) }),
+  setShapeType: (val) => set({ shapeType: val }),
   setFrequency: (val) => set({ frequency: val }),
   setAmplitude: (val) => set({ amplitude: val }),
   setSpeed: (val) => set({ speed: val }),

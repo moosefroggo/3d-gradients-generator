@@ -1,11 +1,18 @@
 {
-  "name": "scalable-flurry",
+  "name": "@mstf/orb",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "main": "dist/orb.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/orb.es.js"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:lib": "vite build --config vite.lib.config.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -21,8 +28,8 @@
     "@react-three/postprocessing": "^3.0.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "leva": "^0.10.1",
     "lucide-react": "^1.14.0",
+    "r3f-perf": "^7.2.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwind-merge": "^3.5.0",

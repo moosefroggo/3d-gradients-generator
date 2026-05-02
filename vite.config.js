@@ -16,4 +16,14 @@ export default defineConfig({
     },
   },
   assetsInclude: ['**/*.glsl', '**/*.vert', '**/*.frag'],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          three: ['three'],
+          r3f: ['@react-three/fiber', '@react-three/drei']
+        }
+      }
+    }
+  }
 })

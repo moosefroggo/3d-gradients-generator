@@ -1,8 +1,8 @@
 import { Canvas } from '@react-three/fiber'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
-import { Environment, ContactShadows } from '@react-three/drei'
+import { Environment } from '@react-three/drei'
+import { Perf } from 'r3f-perf'
 import * as THREE from 'three'
-import AnimatedClouds from './AnimatedClouds.jsx'
 import Orb from './Orb.jsx'
 import ClothText, { buildTextTexture } from './ClothText.jsx'
 import { useState, useEffect, useMemo } from 'react'
@@ -37,15 +37,17 @@ export default function App() {
       <Canvas
         camera={{ position: [0, 0.3, 4], fov: 48 }}
         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
       >
+        <Perf position="bottom-left" />
+        
         {/* Lightest possible blue background */}
         <color attach="background" args={['#E6FDFF']} />
 
         {/* Cool, neutral environment to prevent brown tones */}
         <Environment preset="city" environmentIntensity={0.5} blur={0.8} />
 
-        {/* Floating Scene Lighting - Pure white to avoid brown/yellow tinting on clouds */}
+        {/* Floating Scene Lighting - Pure white */}
         <ambientLight intensity={1.0} color="#ffffff" />
         <directionalLight position={[-3.5, 4.5, 3.5]} intensity={1.0} color="#ffffff" />
         <directionalLight position={[5, 2, 1.5]} intensity={0.5} color="#ffffff" />

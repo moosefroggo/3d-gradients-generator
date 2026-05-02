@@ -21,7 +21,9 @@ export default function ControlPanel() {
     transmission, setTransmission,
     ior, setIor,
     thickness, setThickness,
-    colors, setColorAt, setPreset
+    colors, setColorAt, setPreset,
+    shapeType, setShapeType,
+    quality, setQuality
   } = useStore()
 
   const [exported, setExported] = React.useState(false)
@@ -48,7 +50,16 @@ export default function ControlPanel() {
             <Settings2 className="w-5 h-5 text-gray-500" />
             <h2 className="text-sm font-black tracking-tighter text-gray-800 uppercase">Orb Engine</h2>
           </div>
-          <span className="text-[10px] font-bold text-gray-300 bg-gray-50 px-2 py-1 rounded-full uppercase tracking-widest">v2.2</span>
+          <span className="text-[10px] font-bold text-gray-300 bg-gray-50 px-2 py-1 rounded-full uppercase tracking-widest">v2.3</span>
+        </div>
+
+        <div className="space-y-3 mb-8">
+          <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Engine Quality</Label>
+          <CustomSelect value={quality.toString()} onChange={setQuality} options={[
+            { value: "0", label: "Performance (Fastest)" },
+            { value: "1", label: "Balanced" },
+            { value: "2", label: "Cinema (High Poly)" }
+          ]} />
         </div>
 
         <Tabs.Root defaultValue="noise" className="space-y-6">
@@ -83,13 +94,25 @@ export default function ControlPanel() {
 
           {/* MATERIAL TAB */}
           <Tabs.Content value="material" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="space-y-3">
-              <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Material Type</Label>
-              <CustomSelect value={materialType} onChange={setMaterialType} options={[
-                { value: "glass", label: "Frosted Glass" },
-                { value: "standard", label: "Satin Plastic" },
-                { value: "basic", label: "Unlit Glow" }
-              ]} />
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Base Shape</Label>
+                <CustomSelect value={shapeType} onChange={setShapeType} options={[
+                  { value: "sphere", label: "Sphere" },
+                  { value: "box", label: "Cube" },
+                  { value: "torus", label: "Torus" },
+                  { value: "cylinder", label: "Cylinder" }
+                ]} />
+              </div>
+
+              <div className="space-y-3 pt-4 border-t border-gray-100">
+                <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Surface Finish</Label>
+                <CustomSelect value={materialType} onChange={setMaterialType} options={[
+                  { value: "glass", label: "Frosted Glass" },
+                  { value: "standard", label: "Satin Plastic" },
+                  { value: "basic", label: "Unlit Glow" }
+                ]} />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 gap-6">
