@@ -54,7 +54,7 @@ export default function App() {
             {/* Right Rim Light */}
             <Lightformer form="rect" intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={[20, 2, 1]} />
             {/* Soft Ambient Wash */}
-            <Lightformer form="ring" intensity={0.5} rotation-x={Math.PI / 2} position={[0, -5, 0]} scale={[10, 10, 1]} />
+            <Lightformer form="rect" intensity={0.5} rotation-x={Math.PI / 2} position={[0, -5, 0]} scale={[10, 10, 1]} />
           </group>
         </Environment>
 
