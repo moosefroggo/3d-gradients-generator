@@ -138,11 +138,27 @@ varying vec3 myNormal;
 varying vec3 myViewPosition;
 uniform vec3 uColors[8];
 uniform float uTime;
+uniform int uGradientType;
 uniform int uNoiseType;
 uniform float uFrequency;
 uniform float uEvolutionSpeed;
 
 ${noiseLibrary}
+
+vec3 getGradientColor(float t) {
+  float scaledT = clamp(t, 0.0, 1.0) * 7.0;
+  int i = int(floor(scaledT));
+  float f = scaledT - float(i);
+  
+  if (i == 0) return mix(uColors[0], uColors[1], f);
+  if (i == 1) return mix(uColors[1], uColors[2], f);
+  if (i == 2) return mix(uColors[2], uColors[3], f);
+  if (i == 3) return mix(uColors[3], uColors[4], f);
+  if (i == 4) return mix(uColors[4], uColors[5], f);
+  if (i == 5) return mix(uColors[5], uColors[6], f);
+  if (i == 6) return mix(uColors[6], uColors[7], f);
+  return uColors[7];
+}
 
 void main() {
 `
@@ -279,25 +295,6 @@ export function createOrbMaterial(type, uniforms, options = {}) {
     )
 
     shader.uniforms.uGradientType = uniforms.uGradientType
-
-    shader.fragmentShader = `
-      uniform int uGradientType;
-      
-      vec3 getGradientColor(float t) {
-        float scaledT = clamp(t, 0.0, 1.0) * 7.0;
-        int i = int(floor(scaledT));
-        float f = scaledT - float(i);
-        
-        if (i == 0) return mix(uColors[0], uColors[1], f);
-        if (i == 1) return mix(uColors[1], uColors[2], f);
-        if (i == 2) return mix(uColors[2], uColors[3], f);
-        if (i == 3) return mix(uColors[3], uColors[4], f);
-        if (i == 4) return mix(uColors[4], uColors[5], f);
-        if (i == 5) return mix(uColors[5], uColors[6], f);
-        if (i == 6) return mix(uColors[6], uColors[7], f);
-        return uColors[7];
-      }
-    ` + shader.fragmentShader
 
     shader.fragmentShader = shader.fragmentShader.replace(
       'void main() {',
