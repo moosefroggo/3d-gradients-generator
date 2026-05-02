@@ -1,6 +1,6 @@
 import { Canvas } from '@react-three/fiber'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
-import { Environment } from '@react-three/drei'
+import { Environment, Lightformer } from '@react-three/drei'
 import { Perf } from 'r3f-perf'
 import * as THREE from 'three'
 import Orb from './Orb.jsx'
@@ -44,8 +44,19 @@ export default function App() {
         {/* Lightest possible blue background */}
         <color attach="background" args={['#E6FDFF']} />
 
-        {/* Cool, neutral environment to prevent brown tones */}
-        <Environment preset="city" environmentIntensity={0.5} blur={0.8} />
+        {/* Abstract Studio Environment to prevent building reflections */}
+        <Environment resolution={256} environmentIntensity={0.5}>
+          <group rotation={[-Math.PI / 2, 0, 0]}>
+            {/* Top/Main Light */}
+            <Lightformer form="rect" intensity={2} position={[0, 5, -9]} scale={[10, 10, 1]} />
+            {/* Left Fill */}
+            <Lightformer form="rect" intensity={1} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={[20, 2, 1]} />
+            {/* Right Rim Light */}
+            <Lightformer form="rect" intensity={2} rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={[20, 2, 1]} />
+            {/* Soft Ambient Wash */}
+            <Lightformer form="ring" intensity={0.5} rotation-x={Math.PI / 2} position={[0, -5, 0]} scale={[10, 10, 1]} />
+          </group>
+        </Environment>
 
         {/* Floating Scene Lighting - Pure white */}
         <ambientLight intensity={1.0} color="#ffffff" />
