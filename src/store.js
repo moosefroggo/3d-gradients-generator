@@ -19,7 +19,7 @@ export const useStore = create((set) => ({
   // Noise Selection: 0: Simplex, 1: Perlin, 2: Worley, 3: FBM
   noiseType: 0,
   
-  // Shape Selection: sphere, box, torus, cylinder
+  // Shape Selection: sphere, box, torus, cylinder, plane
   shapeType: 'sphere',
 
   // Parametric controls

@@ -40,6 +40,7 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
   const boxArgs = useMemo(() => [2, 2, 2, quality === 0 ? 32 : quality === 1 ? 64 : 128, quality === 0 ? 32 : quality === 1 ? 64 : 128, quality === 0 ? 32 : quality === 1 ? 64 : 128], [quality])
   const torusArgs = useMemo(() => [1.2, 0.4, quality === 0 ? 48 : quality === 1 ? 96 : 160, quality === 0 ? 96 : quality === 1 ? 192 : 320], [quality])
   const cylinderArgs = useMemo(() => [1.2, 1.2, 2.5, quality === 0 ? 48 : quality === 1 ? 96 : 160, quality === 0 ? 48 : quality === 1 ? 96 : 160], [quality])
+  const planeArgs = useMemo(() => [2, 2, quality === 0 ? 64 : quality === 1 ? 128 : 256, quality === 0 ? 64 : quality === 1 ? 128 : 256], [quality])
 
   const material = useMemo(() => {
     return createOrbMaterial(materialType, customUniforms, {
@@ -98,6 +99,7 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
       {shapeType === 'box' && <boxGeometry args={boxArgs} />}
       {shapeType === 'torus' && <torusGeometry args={torusArgs} />}
       {shapeType === 'cylinder' && <cylinderGeometry args={cylinderArgs} />}
+      {shapeType === 'plane' && <planeGeometry args={planeArgs} />}
     </mesh>
   )
 }

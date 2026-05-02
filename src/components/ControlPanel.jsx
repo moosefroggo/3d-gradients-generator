@@ -122,7 +122,8 @@ export default function ControlPanel() {
                   { value: "sphere", label: "Sphere" },
                   { value: "box", label: "Cube" },
                   { value: "torus", label: "Torus" },
-                  { value: "cylinder", label: "Cylinder" }
+                  { value: "cylinder", label: "Cylinder" },
+                  { value: "plane", label: "Liquid Surface" }
                 ]} />
               </div>
 
