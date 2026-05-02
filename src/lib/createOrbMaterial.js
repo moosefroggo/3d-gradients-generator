@@ -145,18 +145,27 @@ uniform float uEvolutionSpeed;
 
 ${noiseLibrary}
 
+// Dithering function to prevent color banding
+float random(vec2 co) {
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
 vec3 getGradientColor(float t) {
+  // Use a smoother interpolation curve (cosine) instead of pure linear
   float scaledT = clamp(t, 0.0, 1.0) * 7.0;
   int i = int(floor(scaledT));
   float f = scaledT - float(i);
   
-  if (i == 0) return mix(uColors[0], uColors[1], f);
-  if (i == 1) return mix(uColors[1], uColors[2], f);
-  if (i == 2) return mix(uColors[2], uColors[3], f);
-  if (i == 3) return mix(uColors[3], uColors[4], f);
-  if (i == 4) return mix(uColors[4], uColors[5], f);
-  if (i == 5) return mix(uColors[5], uColors[6], f);
-  if (i == 6) return mix(uColors[6], uColors[7], f);
+  // Cosine smooth interpolation
+  float sf = (1.0 - cos(f * 3.14159265)) * 0.5;
+  
+  if (i == 0) return mix(uColors[0], uColors[1], sf);
+  if (i == 1) return mix(uColors[1], uColors[2], sf);
+  if (i == 2) return mix(uColors[2], uColors[3], sf);
+  if (i == 3) return mix(uColors[3], uColors[4], sf);
+  if (i == 4) return mix(uColors[4], uColors[5], sf);
+  if (i == 5) return mix(uColors[5], uColors[6], sf);
+  if (i == 6) return mix(uColors[6], uColors[7], sf);
   return uColors[7];
 }
 
@@ -332,6 +341,9 @@ export function createOrbMaterial(type, uniforms, options = {}) {
 
         baseColor = mix(mixY0, mixY1, nz);
       }
+      
+      // Apply subtle dithering to break up banding
+      baseColor += (random(vUv + uTime) - 0.5) * (1.0/255.0);
       
       vec4 diffuseColor = vec4( baseColor, opacity );
       `
