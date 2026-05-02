@@ -154,6 +154,17 @@ export default function ControlPanel() {
                 ))}
               </div>
             </div>
+
+            <div className="pt-2 text-center">
+              <a 
+                href="https://github.com/ghosh/uiGradients" 
+                target="_blank" 
+                rel="noreferrer"
+                className="text-[9px] font-medium text-gray-300 hover:text-gray-500 transition-colors"
+              >
+                Presets powered by uiGradients (Indrashish Ghosh)
+              </a>
+            </div>
           </Tabs.Content>
         </Tabs.Root>
 
