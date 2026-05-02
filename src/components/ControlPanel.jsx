@@ -23,8 +23,12 @@ export default function ControlPanel() {
     thickness, setThickness,
     colors, setColorAt, setPreset,
     shapeType, setShapeType,
-    quality, setQuality
+    quality, setQuality,
+    gradientType, setGradientType,
+    fullscreen, setFullscreen
   } = useStore()
+  
+  const store = { gradientType, setGradientType, fullscreen, setFullscreen }
 
   const [exported, setExported] = React.useState(false)
 
@@ -71,6 +75,25 @@ export default function ControlPanel() {
 
           {/* NOISE & GEOMETRY TAB */}
           <Tabs.Content value="noise" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="flex items-center justify-between p-4 bg-gray-50/50 border border-gray-100 rounded-2xl">
+              <div className="space-y-0.5">
+                <Label className="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Edge-to-Edge</Label>
+                <p className="text-[9px] text-gray-400 font-medium uppercase tracking-tighter">Perfect Fullscreen Fill</p>
+              </div>
+              <button 
+                onClick={() => store.setFullscreen(!store.fullscreen)}
+                className={cn(
+                  "w-12 h-6 rounded-full transition-all relative duration-300",
+                  store.fullscreen ? "bg-black" : "bg-gray-200"
+                )}
+              >
+                <div className={cn(
+                  "absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300",
+                  store.fullscreen ? "left-7" : "left-1"
+                )} />
+              </button>
+            </div>
+
             <div className="space-y-3">
               <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Algorithm</Label>
               <CustomSelect value={noiseType.toString()} onChange={setNoiseType} options={[
@@ -132,6 +155,15 @@ export default function ControlPanel() {
           {/* COLORS TAB */}
           <Tabs.Content value="colors" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="space-y-3">
+              <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Gradient Style</Label>
+              <CustomSelect value={store.gradientType.toString()} onChange={store.setGradientType} options={[
+                { value: "0", label: "Generative Noise" },
+                { value: "1", label: "Linear Ramp" },
+                { value: "2", label: "Radial Sphere" }
+              ]} />
+            </div>
+
+            <div className="space-y-3 pt-4 border-t border-gray-100">
               <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Presets</Label>
               <CustomSelect value="" onChange={setPreset} options={Object.keys(GRADIENT_PRESETS).map(k => ({
                 value: k, label: k.charAt(0).toUpperCase() + k.slice(1)

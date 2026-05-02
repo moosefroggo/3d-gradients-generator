@@ -278,6 +278,27 @@ export function createOrbMaterial(type, uniforms, options = {}) {
       `
     )
 
+    shader.uniforms.uGradientType = uniforms.uGradientType
+
+    shader.fragmentShader = `
+      uniform int uGradientType;
+      
+      vec3 getGradientColor(float t) {
+        float scaledT = clamp(t, 0.0, 1.0) * 7.0;
+        int i = int(floor(scaledT));
+        float f = scaledT - float(i);
+        
+        if (i == 0) return mix(uColors[0], uColors[1], f);
+        if (i == 1) return mix(uColors[1], uColors[2], f);
+        if (i == 2) return mix(uColors[2], uColors[3], f);
+        if (i == 3) return mix(uColors[3], uColors[4], f);
+        if (i == 4) return mix(uColors[4], uColors[5], f);
+        if (i == 5) return mix(uColors[5], uColors[6], f);
+        if (i == 6) return mix(uColors[6], uColors[7], f);
+        return uColors[7];
+      }
+    ` + shader.fragmentShader
+
     shader.fragmentShader = shader.fragmentShader.replace(
       'void main() {',
       orbShaderFragment
@@ -286,24 +307,33 @@ export function createOrbMaterial(type, uniforms, options = {}) {
     shader.fragmentShader = shader.fragmentShader.replace(
       'vec4 diffuseColor = vec4( diffuse, opacity );',
       `
-      vec3 p = vOriginalPosition * uFrequency + vec3(uTime * uEvolutionSpeed * 0.5, 0.0, 0.0);
-      float nx = getNoise(uNoiseType, p * 1.2);
-      float ny = getNoise(uNoiseType, p * 1.3 + vec3(0.0, uTime * uEvolutionSpeed * 0.6, 0.0));
-      float nz = getNoise(uNoiseType, p * 1.1 + vec3(0.0, 0.0, uTime * uEvolutionSpeed * 0.7));
+      vec3 baseColor;
       
-      nx = smoothstep(-0.5, 0.5, nx);
-      ny = smoothstep(-0.5, 0.5, ny);
-      nz = smoothstep(-0.5, 0.5, nz);
+      if (uGradientType == 1) { // Linear
+        baseColor = getGradientColor(vUv.x);
+      } else if (uGradientType == 2) { // Radial
+        baseColor = getGradientColor(length(vUv - 0.5) * 2.0);
+      } else { // Noise (Default)
+        vec3 p = vOriginalPosition * uFrequency + vec3(uTime * uEvolutionSpeed * 0.5, 0.0, 0.0);
+        float nx = getNoise(uNoiseType, p * 1.2);
+        float ny = getNoise(uNoiseType, p * 1.3 + vec3(0.0, uTime * uEvolutionSpeed * 0.6, 0.0));
+        float nz = getNoise(uNoiseType, p * 1.1 + vec3(0.0, 0.0, uTime * uEvolutionSpeed * 0.7));
+        
+        nx = smoothstep(-0.5, 0.5, nx);
+        ny = smoothstep(-0.5, 0.5, ny);
+        nz = smoothstep(-0.5, 0.5, nz);
 
-      vec3 mixX0 = mix(uColors[0], uColors[1], nx);
-      vec3 mixX1 = mix(uColors[2], uColors[3], nx);
-      vec3 mixX2 = mix(uColors[4], uColors[5], nx);
-      vec3 mixX3 = mix(uColors[6], uColors[7], nx);
+        vec3 mixX0 = mix(uColors[0], uColors[1], nx);
+        vec3 mixX1 = mix(uColors[2], uColors[3], nx);
+        vec3 mixX2 = mix(uColors[4], uColors[5], nx);
+        vec3 mixX3 = mix(uColors[6], uColors[7], nx);
 
-      vec3 mixY0 = mix(mixX0, mixX1, ny);
-      vec3 mixY1 = mix(mixX2, mixX3, ny);
+        vec3 mixY0 = mix(mixX0, mixX1, ny);
+        vec3 mixY1 = mix(mixX2, mixX3, ny);
 
-      vec3 baseColor = mix(mixY0, mixY1, nz);
+        baseColor = mix(mixY0, mixY1, nz);
+      }
+      
       vec4 diffuseColor = vec4( baseColor, opacity );
       `
     )

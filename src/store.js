@@ -34,6 +34,12 @@ export const useStore = create((set) => ({
   // Evolution Speed for noise shifting
   evolutionSpeed: 0.3,
 
+  // Gradient Style: 0: Noise, 1: Linear, 2: Radial
+  gradientType: 0,
+
+  // Fullscreen mode (Edge-to-Edge)
+  fullscreen: false,
+
   // Material settings
   materialType: 'glass', // glass, standard, basic
   roughness: 0.2,
@@ -55,6 +61,8 @@ export const useStore = create((set) => ({
   setScaleX: (val) => set({ scaleX: val }),
   setScaleY: (val) => set({ scaleY: val }),
   setEvolutionSpeed: (val) => set({ evolutionSpeed: val }),
+  setGradientType: (val) => set({ gradientType: parseInt(val) }),
+  setFullscreen: (val) => set({ fullscreen: val }),
 
   setMaterialType: (val) => set({ materialType: val }),
   setRoughness: (val) => set({ roughness: val }),

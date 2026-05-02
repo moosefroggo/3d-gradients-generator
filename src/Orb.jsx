@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useStore } from './store'
 import { createOrbMaterial } from './lib/createOrbMaterial'
@@ -7,6 +7,7 @@ import { createOrbMaterial } from './lib/createOrbMaterial'
 export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foreground', speed, colors: propColors, ...props }) {
   const meshRef = useRef()
   const store = useStore()
+  const { viewport } = useThree()
   
   const isBg = mode === 'background'
   const quality = isBg ? 0 : store.quality
@@ -18,8 +19,8 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
   const noiseType = store.noiseType
   const frequency = isBg ? Math.min(store.frequency, 0.4) : store.frequency
   const amplitude = isBg ? Math.min(store.amplitude, 0.1) : store.amplitude
-  const scaleX = store.scaleX
-  const scaleY = store.scaleY
+  const gradientType = store.gradientType
+  const fullscreen = store.fullscreen
 
   const customUniforms = useMemo(() => ({
     uColors: { value: Array.from({ length: 8 }, () => new THREE.Color()) },
@@ -31,7 +32,8 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
     uAmplitude: { value: 0 },
     uEvolutionSpeed: { value: 0 },
     uScaleX: { value: 0 },
-    uScaleY: { value: 0 }
+    uScaleY: { value: 0 },
+    uGradientType: { value: 0 }
   }), [])
 
   const sphereArgs = useMemo(() => [1.4, quality === 0 ? 64 : quality === 1 ? 128 : 256, quality === 0 ? 128 : quality === 1 ? 256 : 512], [quality])
@@ -50,6 +52,15 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
     })
   }, [materialType, mode, store.roughness, store.metalness, store.transmission, store.ior, store.thickness])
 
+  // Calculate scaling for edge-to-edge
+  const finalScale = useMemo(() => {
+    if (!fullscreen) return [store.scaleX, store.scaleY, 2.5]
+    // In fullscreen, we want it to cover the viewport edges.
+    // Factor 1.5 ensures the edges of the blob (after noise) don't show the background
+    const s = Math.max(viewport.width, viewport.height) * 1.5
+    return [s, s, s]
+  }, [fullscreen, viewport.width, viewport.height, store.scaleX, store.scaleY])
+
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime()
     customUniforms.uTime.value = t
@@ -61,8 +72,9 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
     customUniforms.uFrequency.value = frequency
     customUniforms.uAmplitude.value = amplitude
     customUniforms.uEvolutionSpeed.value = evolutionSpeed
-    customUniforms.uScaleX.value = scaleX
-    customUniforms.uScaleY.value = scaleY
+    customUniforms.uScaleX.value = finalScale[0]
+    customUniforms.uScaleY.value = finalScale[1]
+    customUniforms.uGradientType.value = gradientType
     
     // Update colors if they changed
     activeColors.forEach((c, i) => {
@@ -77,7 +89,7 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
   })
 
   return (
-    <mesh ref={meshRef} position={position} scale={[scaleX, scaleY, 2.5]} material={material} {...props}>
+    <mesh ref={meshRef} position={position} scale={finalScale} material={material} {...props}>
       {shapeType === 'sphere' && <sphereGeometry args={sphereArgs} />}
       {shapeType === 'box' && <boxGeometry args={boxArgs} />}
       {shapeType === 'torus' && <torusGeometry args={torusArgs} />}
