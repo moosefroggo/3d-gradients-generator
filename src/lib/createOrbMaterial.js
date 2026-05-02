@@ -269,7 +269,7 @@ export function createOrbMaterial(type, uniforms, options = {}) {
         vec3 myTangent = normalize(cross(helper, normal));
         vec3 myBitangent = normalize(cross(normal, myTangent));
         
-        float stepSize = 0.02;
+        float stepSize = 0.005; // Smaller step for much smoother peaks
         vec3 p0_n = getMorphedPosition(position);
         vec3 p1_n = getMorphedPosition(position + myTangent * stepSize);
         vec3 p2_n = getMorphedPosition(position + myBitangent * stepSize);
