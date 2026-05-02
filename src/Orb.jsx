@@ -55,11 +55,13 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
   // Calculate scaling for edge-to-edge
   const finalScale = useMemo(() => {
     if (!fullscreen) return [store.scaleX, store.scaleY, 2.5]
-    // In fullscreen, we want it to cover the viewport edges.
-    // Factor 1.5 ensures the edges of the blob (after noise) don't show the background
-    const s = Math.max(viewport.width, viewport.height) * 1.5
+    
+    // Get the viewport size specifically at the orb's Z position
+    // This accounts for perspective - things get "larger" the further they are from the camera
+    const currentViewport = viewport.getCurrentViewport(null, position)
+    const s = Math.max(currentViewport.width, currentViewport.height) * 1.5
     return [s, s, s]
-  }, [fullscreen, viewport.width, viewport.height, store.scaleX, store.scaleY])
+  }, [fullscreen, viewport, position, store.scaleX, store.scaleY])
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime()
@@ -89,7 +91,7 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
   })
 
   return (
-    <mesh ref={meshRef} position={position} scale={finalScale} material={material} {...props}>
+    <mesh ref={meshRef} position={position} material={material} {...props} scale={finalScale}>
       {shapeType === 'sphere' && <sphereGeometry args={sphereArgs} />}
       {shapeType === 'box' && <boxGeometry args={boxArgs} />}
       {shapeType === 'torus' && <torusGeometry args={torusArgs} />}
