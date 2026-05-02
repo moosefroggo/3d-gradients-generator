@@ -56,12 +56,14 @@ export default function Orb({ textTexture, position = [0, 0, -8], mode = 'foregr
   const finalScale = useMemo(() => {
     if (!fullscreen) return [store.scaleX, store.scaleY, 2.5]
     
-    // Get the viewport size specifically at the orb's Z position
-    // This accounts for perspective - things get "larger" the further they are from the camera
-    const currentViewport = viewport.getCurrentViewport(null, position)
-    const s = Math.max(currentViewport.width, currentViewport.height) * 1.5
+    // Stable fallback for viewport scaling
+    // Camera is at z=4, Orb is at z=-4. Distance = 8.
+    // Standard viewport is calculated at distance camera.position.z from the camera.
+    // So the scale factor to fill the screen at distance 8 is roughly 2.0x the z=0 viewport.
+    const factor = 2.0 
+    const s = Math.max(viewport.width, viewport.height) * factor * 1.2
     return [s, s, s]
-  }, [fullscreen, viewport, position, store.scaleX, store.scaleY])
+  }, [fullscreen, viewport.width, viewport.height, store.scaleX, store.scaleY])
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime()

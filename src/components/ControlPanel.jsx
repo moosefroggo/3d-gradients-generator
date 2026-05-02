@@ -28,8 +28,6 @@ export default function ControlPanel() {
     fullscreen, setFullscreen
   } = useStore()
   
-  const store = { gradientType, setGradientType, fullscreen, setFullscreen }
-
   const [exported, setExported] = React.useState(false)
 
   const exportConfig = () => {
@@ -81,15 +79,15 @@ export default function ControlPanel() {
                 <p className="text-[9px] text-gray-400 font-medium uppercase tracking-tighter">Perfect Fullscreen Fill</p>
               </div>
               <button 
-                onClick={() => store.setFullscreen(!store.fullscreen)}
+                onClick={() => setFullscreen(!fullscreen)}
                 className={cn(
                   "w-12 h-6 rounded-full transition-all relative duration-300",
-                  store.fullscreen ? "bg-black" : "bg-gray-200"
+                  fullscreen ? "bg-black" : "bg-gray-200"
                 )}
               >
                 <div className={cn(
                   "absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300",
-                  store.fullscreen ? "left-7" : "left-1"
+                  fullscreen ? "left-7" : "left-1"
                 )} />
               </button>
             </div>
@@ -152,11 +150,10 @@ export default function ControlPanel() {
             </div>
           </Tabs.Content>
 
-          {/* COLORS TAB */}
           <Tabs.Content value="colors" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="space-y-3">
               <Label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Gradient Style</Label>
-              <CustomSelect value={store.gradientType.toString()} onChange={store.setGradientType} options={[
+              <CustomSelect value={gradientType.toString()} onChange={setGradientType} options={[
                 { value: "0", label: "Generative Noise" },
                 { value: "1", label: "Linear Ramp" },
                 { value: "2", label: "Radial Sphere" }
