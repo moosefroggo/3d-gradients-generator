@@ -151,7 +151,7 @@ export function createOrbMaterial(type, uniforms, options = {}) {
   const isBg = options.mode === 'background'
   let mat
 
-  if (type === 'basic' || isBg) {
+  if (type === 'basic') {
     mat = new THREE.MeshBasicMaterial()
   } else if (type === 'standard') {
     mat = new THREE.MeshStandardMaterial({
@@ -159,6 +159,9 @@ export function createOrbMaterial(type, uniforms, options = {}) {
       metalness: options.metalness ?? 0.1
     })
   } else {
+    if (isBg) {
+      console.warn("OrbBackground: Using 'glass' (transmission) in background mode disables low-power benefits and causes severe performance issues. Consider using 'basic'.")
+    }
     mat = new THREE.MeshPhysicalMaterial({
       roughness: options.roughness ?? 0.2,
       metalness: options.metalness ?? 0.1,
@@ -231,7 +234,7 @@ export function createOrbMaterial(type, uniforms, options = {}) {
       }
     ` + shader.vertexShader
 
-    if (!isBg && type !== 'basic') {
+    if (type !== 'basic') {
       shader.vertexShader = shader.vertexShader.replace(
         '#include <beginnormal_vertex>',
         `
@@ -305,7 +308,7 @@ export function createOrbMaterial(type, uniforms, options = {}) {
       `
     )
 
-    if (!isBg && type !== 'basic') {
+    if (type !== 'basic') {
       shader.fragmentShader = shader.fragmentShader.replace(
         '#include <emissivemap_fragment>',
         `

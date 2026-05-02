@@ -3,7 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { createOrbMaterial } from './lib/createOrbMaterial'
 
-function OrbBackgroundMesh({ colors, noiseType, frequency, amplitude, speed, scaleX = 2.5, scaleY = 2.5 }) {
+function OrbBackgroundMesh({ colors, noiseType, frequency, amplitude, speed, materialType, scaleX = 2.5, scaleY = 2.5 }) {
   const meshRef = useRef()
 
   const customUniforms = useMemo(() => ({
@@ -20,8 +20,8 @@ function OrbBackgroundMesh({ colors, noiseType, frequency, amplitude, speed, sca
   }), [])
 
   const material = useMemo(() => {
-    return createOrbMaterial('basic', customUniforms, { mode: 'background' })
-  }, [customUniforms])
+    return createOrbMaterial(materialType, customUniforms, { mode: 'background' })
+  }, [materialType, customUniforms])
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime()
@@ -58,6 +58,7 @@ export default function OrbBackground({
   frequency = 0.4,
   amplitude = 0.1,
   speed = 0.1,
+  materialType = 'basic',
   className = ""
 }) {
   return (
@@ -69,6 +70,7 @@ export default function OrbBackground({
           frequency={frequency}
           amplitude={amplitude}
           speed={speed}
+          materialType={materialType}
         />
       </Canvas>
     </div>
