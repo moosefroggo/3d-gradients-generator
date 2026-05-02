@@ -197,8 +197,8 @@ function CustomSelect({ value, onChange, options, placeholder }) {
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <Select.Content className="overflow-hidden bg-white/95 backdrop-blur-2xl rounded-2xl border border-gray-100 shadow-2xl z-[100]">
-          <Select.Viewport className="p-2">
+        <Select.Content className="overflow-hidden bg-white/95 backdrop-blur-2xl rounded-2xl border border-gray-100 shadow-2xl z-[100] max-h-[300px]">
+          <Select.Viewport className="p-2 h-full overflow-y-auto">
             {options.map(opt => (
               <Select.Item
                 key={opt.value}

@@ -1,12 +1,16 @@
 import { create } from 'zustand'
 
-export const GRADIENT_PRESETS = {
+import { UI_GRADIENTS } from './uiGradients'
+
+const CUSTOM_PRESETS = {
   pantone: ['#F1ECCE', '#D6D2CB', '#F4EAE2', '#F2EFE9', '#D9DEE0', '#EFCAB5', '#C7E1D4', '#DCD2DD'],
   midnight: ['#0f0c29', '#302b63', '#24243e', '#1a1a2e', '#16213e', '#0f3460', '#533483', '#000000'],
   lava: ['#ff4b1f', '#ff9068', '#f12711', '#f5af19', '#ed1c24', '#fdc830', '#f37335', '#23074d'],
   emerald: ['#00b09b', '#96c93d', '#11998e', '#38ef7d', '#56ab2f', '#a8e063', '#004e92', '#000428'],
   neon: ['#00f2ff', '#0061ff', '#60efff', '#00ff87', '#ff00ff', '#7000ff', '#ff0080', '#ff8c00']
 }
+
+export const GRADIENT_PRESETS = { ...CUSTOM_PRESETS, ...UI_GRADIENTS }
 
 export const useStore = create((set) => ({
   // Performance Quality: 0: Performance, 1: Balanced, 2: Cinema
