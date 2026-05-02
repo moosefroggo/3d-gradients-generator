@@ -168,11 +168,12 @@ export function createOrbMaterial(type, uniforms, options = {}) {
   let mat
 
   if (type === 'basic') {
-    mat = new THREE.MeshBasicMaterial()
+    mat = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })
   } else if (type === 'standard') {
     mat = new THREE.MeshStandardMaterial({
       roughness: options.roughness ?? 0.2,
-      metalness: options.metalness ?? 0.1
+      metalness: options.metalness ?? 0.1,
+      side: THREE.DoubleSide
     })
   } else {
     if (isBg) {
@@ -188,7 +189,8 @@ export function createOrbMaterial(type, uniforms, options = {}) {
       clearcoat: 1.0,
       clearcoatRoughness: 0.4,
       iridescence: 0.3,
-      iridescenceIOR: 1.3
+      iridescenceIOR: 1.3,
+      side: THREE.DoubleSide
     })
   }
 
