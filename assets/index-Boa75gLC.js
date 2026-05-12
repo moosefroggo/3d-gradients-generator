@@ -174,7 +174,7 @@ return orthographicDepthToViewZ(depth,cameraNear,cameraFar);
 // 3D Simplex noise
 vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
 vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
-float snoise(vec3 v){ 
+float snoise(vec3 v){
   const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
   const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
   vec3 i  = floor(v + dot(v, C.yyy) );
@@ -186,10 +186,10 @@ float snoise(vec3 v){
   vec3 x1 = x0 - i1 + 1.0 * C.xxx;
   vec3 x2 = x0 - i2 + 2.0 * C.xxx;
   vec3 x3 = x0 - 1.0 + 3.0 * C.xxx;
-  i = mod(i, 289.0 ); 
-  vec4 p = permute( permute( permute( 
+  i = mod(i, 289.0 );
+  vec4 p = permute( permute( permute(
              i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
-           + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) 
+           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
            + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
   float n_ = 1.0/7.0;
   vec3  ns = n_ * D.wyz - D.xzx;
@@ -217,7 +217,7 @@ float snoise(vec3 v){
   p3 *= norm.w;
   vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
   m = m * m;
-  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), 
+  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),
                                 dot(p2,x2), dot(p3,x3) ) );
 }
 
@@ -323,10 +323,10 @@ vec3 getGradientColor(float t) {
   float scaledT = clamp(t, 0.0, 1.0) * 7.0;
   int i = int(floor(scaledT));
   float f = scaledT - float(i);
-  
+
   // Cosine smooth interpolation
   float sf = (1.0 - cos(f * 3.14159265)) * 0.5;
-  
+
   if (i == 0) return mix(uColors[0], uColors[1], sf);
   if (i == 1) return mix(uColors[1], uColors[2], sf);
   if (i == 2) return mix(uColors[2], uColors[3], sf);
@@ -342,12 +342,12 @@ void main() {
       // Project the vertex's world position onto the Text's local UV space.
       vec3 worldPos = morphedPos * vec3(uScaleX, uScaleY, uScaleZ) + vec3(0.0, 0.0, -4.0);
       vec2 textUV = vec2((worldPos.x + 1.4) / 2.8, (worldPos.y + 0.75) / 1.6);
-      
+
       if (textUV.x >= -0.05 && textUV.x <= 1.05 && textUV.y >= -0.05 && textUV.y <= 1.05) {
           float softAlpha = texture2D(uTextMask, textUV).a;
           if (softAlpha > 0.01) {
               float dentThreshold = -0.3;
-              float depthPenetration = (worldPos.z - dentThreshold) * 2.0; 
+              float depthPenetration = (worldPos.z - dentThreshold) * 2.0;
               if (depthPenetration > 0.0) {
                   float mask = smoothstep(0.0, 0.4, softAlpha);
                   float dent = (depthPenetration * mask) / uScaleZ;
@@ -387,12 +387,12 @@ void main() {
         vec3 helper = abs(normal.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
         vec3 myTangent = normalize(cross(helper, normal));
         vec3 myBitangent = normalize(cross(normal, myTangent));
-        
-        float stepSize = 0.02; // Increased step size for much smoother normals on dense geometry
+
+        float stepSize = 0.08; // Increased step size for much smoother normals on dense geometry
         vec3 p0_n = getMorphedPosition(position, normal);
         vec3 p1_n = getMorphedPosition(position + myTangent * stepSize, normal);
         vec3 p2_n = getMorphedPosition(position + myBitangent * stepSize, normal);
-        
+
         vec3 reconstructedNormal = cross(p1_n - p0_n, p2_n - p0_n);
         if (length(reconstructedNormal) > 0.00001) {
             reconstructedNormal = normalize(reconstructedNormal);
@@ -401,14 +401,14 @@ void main() {
         } else {
             reconstructedNormal = normal;
         }
-        
+
         vec3 objectNormal = reconstructedNormal;
         `)),n.vertexShader=n.vertexShader.replace("#include <begin_vertex>",`
       vec3 transformed = getMorphedPosition(position, normal);
       vUv = uv;
       vOriginalPosition = position;
       vPosition = transformed;
-      
+
       #ifdef USE_NORMAL
         myNormal = normalize(normalMatrix * objectNormal);
       #else
@@ -419,7 +419,7 @@ void main() {
       myViewPosition = -mvPos.xyz;
       `),n.uniforms.uGradientType=t.uGradientType,n.fragmentShader=n.fragmentShader.replace("void main() {",Ja),n.fragmentShader=n.fragmentShader.replace("vec4 diffuseColor = vec4( diffuse, opacity );",`
       vec3 baseColor;
-      
+
       if (uGradientType == 1) { // Linear
         baseColor = getGradientColor(vUv.x);
       } else if (uGradientType == 2) { // Radial
@@ -429,7 +429,7 @@ void main() {
         float nx = getNoise(uNoiseType, p * 1.2);
         float ny = getNoise(uNoiseType, p * 1.3 + vec3(0.0, uTime * uEvolutionSpeed * 0.6, 0.0));
         float nz = getNoise(uNoiseType, p * 1.1 + vec3(0.0, 0.0, uTime * uEvolutionSpeed * 0.7));
-        
+
         nx = smoothstep(-0.5, 0.5, nx);
         ny = smoothstep(-0.5, 0.5, ny);
         nz = smoothstep(-0.5, 0.5, nz);
@@ -444,14 +444,14 @@ void main() {
 
         baseColor = mix(mixY0, mixY1, nz);
       }
-      
+
       // Apply subtle dithering to break up banding (Screen Space)
       baseColor += (random(gl_FragCoord.xy + uTime) - 0.5) * (1.0/255.0);
-      
+
       vec4 diffuseColor = vec4( baseColor, opacity );
       `),e!=="basic"&&(n.fragmentShader=n.fragmentShader.replace("#include <emissivemap_fragment>",`
         #include <emissivemap_fragment>
-        totalEmissiveRadiance += baseColor * 0.2; 
+        totalEmissiveRadiance += baseColor * 0.2;
         `),n.fragmentShader=n.fragmentShader.replace("#include <dithering_fragment>",`
         #include <dithering_fragment>
         float edgeRim = clamp(1.0 - max(dot(normalize(myNormal), normalize(myViewPosition)), 0.0), 0.0, 1.0);
