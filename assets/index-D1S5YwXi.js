@@ -311,7 +311,6 @@ uniform int uNoiseType;
 uniform float uFrequency;
 uniform float uEvolutionSpeed;
 uniform float uFlowAngle;
-uniform float uFlowAngle;
 
 ${gr}
 
@@ -371,7 +370,6 @@ void main() {
       uniform float uAmplitude;
       uniform float uEvolutionSpeed;
 uniform float uFlowAngle;
-uniform float uFlowAngle;
       uniform float uScaleX;
       uniform float uScaleY;
       uniform float uScaleZ;
@@ -402,7 +400,9 @@ uniform float uFlowAngle;
             reconstructedNormal = normalize(reconstructedNormal);
             // Ensure normal points outwards
             if (dot(reconstructedNormal, normal) < 0.0) reconstructedNormal = -reconstructedNormal;
-            float blend = clamp(dot(reconstructedNormal, normal), 0.0, 1.0);n            blend = blend * blend;n            reconstructedNormal = normalize(mix(normal, reconstructedNormal, blend));
+            float blend = clamp(dot(reconstructedNormal, normal), 0.0, 1.0);
+            blend = blend * blend;
+            reconstructedNormal = normalize(mix(normal, reconstructedNormal, blend));
         } else {
             reconstructedNormal = normal;
         }
