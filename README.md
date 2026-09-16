@@ -1,32 +1,28 @@
-# Morph — 3D Gradient Generator
+# Morph: 3D Gradient Generator
 
-An interactive WebGL studio for creating animated 3D gradients with procedural noise, real-time material controls, and exportable configurations.
+Make animated 3D gradients in your browser. Change the colors, shapes, noise, and materials, then copy your settings to reuse them.
 
-**[Open the live tool →](https://moosefroggo.github.io/3d-gradients-generator/)**
+[Try Morph](https://moosefroggo.github.io/3d-gradients-generator/)
 
-## What it does
+## What you can do
 
-- Generates animated gradients from a large preset library or custom colors
-- Morphs spheres, boxes, toruses, cylinders, and planes with GPU-driven noise
-- Switches between Simplex, Perlin, Worley, and fractal noise models
-- Tunes frequency, distortion, evolution speed, scale, and flow direction in real time
-- Supports glow, plastic, and glass-like material treatments
-- Provides selectable geometry quality for different devices
-- Copies the current visual configuration to the clipboard for reuse
+- Start with a preset or choose your own colors
+- Change the shape and how it moves
+- Choose Simplex, Perlin, Worley, or fractal noise
+- Adjust speed, scale, distortion, and flow direction
+- Try glow, plastic, and glass-like materials
+- Lower the geometry quality on slower devices
+- Copy the current settings to the clipboard
 
-## Implementation
+## How it works
 
-Morph injects custom GLSL into Three.js materials through `onBeforeCompile`. The shader library implements four procedural noise models, vertex displacement, multiple gradient mappings, and dithering to reduce visible color banding. Zustand keeps the control panel and render scene synchronized.
+Morph uses Three.js and custom GLSL shaders to animate the shapes. React Three Fiber renders the scene. Zustand keeps the controls and the scene in sync.
 
-The repository also exposes the core scene, material factory, and gradient presets through a Vite library build.
+The repository also includes a Vite library build for the scene, materials, and gradient presets.
 
 ## Stack
 
-- React 19 and Vite
-- Three.js, React Three Fiber, and Drei
-- GLSL shaders and post-processing
-- Zustand for interactive state
-- Radix UI and Tailwind CSS for controls
+React 19, Vite, Three.js, React Three Fiber, GLSL, Zustand, Radix UI, and Tailwind CSS.
 
 ## Run locally
 
@@ -35,7 +31,7 @@ npm install
 npm run dev
 ```
 
-Production checks:
+To check the build:
 
 ```bash
 npm run lint
@@ -43,6 +39,4 @@ npm run build
 npm run build:lib
 ```
 
-## Project status
-
-Morph is a working creative-tool prototype. It runs entirely in the browser and does not require a backend.
+Morph is a browser-based prototype. It does not need a backend.
